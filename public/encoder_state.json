@@ -1,5 +1,5 @@
 {
-    "directorName": [
+    "director_name": [
         "Chris Buck",
         "Kyle Balda",
         "Lee Unkrich",
@@ -1446,7 +1446,7 @@
         "Eric Styles",
         "Tony Maylam"
     ],
-    "productionCompanies": [
+    "production_companies": [
         "Qu\u00e9bec Production Services Tax Credit",
         "Abu Dhabi Film Commission",
         "Colorado Office of Film, Television & Media",
@@ -5033,7 +5033,7 @@
         "Documentary",
         "Foreign"
     ],
-    "spokenLanguages": [
+    "spoken_languages": [
         "\u0ba4\u0bae\u0bbf\u0bb4\u0bcd",
         "svenska",
         "\u049b\u0430\u0437\u0430\u049b",

@@ -2,31 +2,32 @@
 import React, { useState, ChangeEvent, useEffect, FormEvent } from 'react';
 
 interface FormData {
+  movie_name: string;
   budget: number;
   runtime: number;
-  directorName: string;
-  productionCompanies: string[];
+  director_name: string;
+  production_companies: string[];
   genres: string[];
-  spokenLanguages: string[];
+  spoken_languages: string[];
   country: string;
-  titleYear: number;
-  releaseWeek: number;
-  castSize: number;
-  crewSize: number;
-  numberProductionCompanies: number;
-  directorCount: number;
-  writerCount: number;
-  editorCount: number;
-  soundDepartmentSize: number;
-  costumeDepartmentSize: number;
-  editingDepartmentSize: number;
-  productionDepartmentSize: number;
-  artDepartmentSize: number;
-  cameraDepartmentSize: number;
-  vxDepartmentSize: number;
-  maleCastCount: number;
-  femaleCastCount: number;
-  unstatedGenderCastCount: number;
+  title_year: number;
+  release_week: number;
+  cast_size: number;
+  crew_size: number;
+  number_production_companies: number;
+  director_count: number;
+  writer_count: number;
+  editor_count: number;
+  sound_department_size: number;
+  costume_department_size: number;
+  editing_department_size: number;
+  production_department_size: number;
+  art_department_size: number;
+  camera_department_size: number;
+  vx_department_size: number;
+  male_cast_count: number;
+  female_cast_count: number;
+  unstated_gender_cast_count: number;
   tagline: string;
   overview: string;
   [key: string]: number | string | string[];
@@ -39,33 +40,34 @@ interface Options {
 
 const MovieForm: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
-    budget: 0,
-    runtime: 0,
-    directorName: '',
-    productionCompanies: [],
-    genres: [],
-    spokenLanguages: [],
-    country: '',
-    titleYear: 0,
-    releaseWeek: 0,
-    castSize: 0,
-    crewSize: 0,
-    numberProductionCompanies: 0,
-    directorCount: 0,
-    writerCount: 0,
-    editorCount: 0,
-    soundDepartmentSize: 0,
-    costumeDepartmentSize: 0,
-    editingDepartmentSize: 0,
-    productionDepartmentSize: 0,
-    artDepartmentSize: 0,
-    cameraDepartmentSize: 0,
-    vxDepartmentSize: 0,
-    maleCastCount: 0,
-    femaleCastCount: 0,
-    unstatedGenderCastCount: 0,
-    tagline: '',
-    overview: '',
+      movie_name: "Dreamland",
+      budget: 5000000,
+      runtime: 130,
+      director_name: "James Cameron",
+      production_companies: ["Paramount"],
+      genres: ["Action"],
+      spoken_languages: ["English"],
+      country: "United States of America",
+      title_year: 2022,
+      release_week: 4,
+      cast_size: 50,
+      crew_size: 120,
+      number_production_companies: 1,
+      director_count: 1,
+      writer_count: 7,
+      editor_count: 3,
+      sound_department_size: 8,
+      costume_department_size: 12,
+      editing_department_size: 19,
+      production_department_size: 5,
+      art_department_size: 4,
+      camera_department_size: 23,
+      vx_department_size: 14,
+      male_cast_count: 25,
+      female_cast_count: 25,
+      unstated_gender_cast_count: 0,
+      tagline: "Beyond the Depths of Imagination",
+      overview: "In the not-too-distant future, humanity faces an unprecedented challenge as rising sea levels threaten civilization. Renowned scientist and visionary explorer Dr. Elena Myles, played by a strong female lead, discovers an ancient underwater city that is not only uninhabited but also technologically advanced. With the help of her elite team of submariners and the state-of-the-art submersible Neptunes Arrow, Dr. Myles ventures into the depths of the Pacific Ocean to unlock the secrets of this submerged metropolis. Their journey becomes a race against time as they uncover the citys potential to save the world from impending doom, all while battling a rival expedition determined to claim the discovery for their nefarious purposes. Directed by James Cameron, this film combines stunning visuals of deep-sea ecosystems with thrilling action and a poignant message about environmental conservation and human resilience.",
   });
 
 
@@ -112,28 +114,26 @@ const MovieForm: React.FC = () => {
 
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault(); // Prevent the default form submission behavior
+    event.preventDefault(); 
+    const { movie_name, ...dataToSend } = formData;
 
-    // Construct the headers and body of the request
     const requestOptions = {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(formData) // Convert the formData object to a JSON string
+        body: JSON.stringify(dataToSend) 
     };
 
     try {
-        // Send the request to the endpoint
-        const response = await fetch('https://box-officer-predict-wap47zlzwq-uk.a.run.app/predict', requestOptions);
+        const response = await fetch('http://127.0.0.1:8080/predict', requestOptions);
         
         if (!response.ok) {
-            // If the response is not 2xx, throw an error
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const data = await response.json(); // Parse the JSON response
-        console.log(data); // Log the data received from the server
+        const data = await response.json(); 
+        console.log(data);
     } catch (error) {
         console.error('There was an error!', error);
     }
@@ -144,7 +144,14 @@ const MovieForm: React.FC = () => {
     <div className="bg-black min-h-screen w-full flex flex-col">
     <form onSubmit={handleSubmit} className="text-white flex-1">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {/* Styling for Budget input */}
+
+        <div className="form-control w-full max-w-xs">
+          <label className="label">
+            <span className="label-text text-white">Movie Name:</span>
+          </label>
+          <input type="string" name="movie_name" value={formData.movie_name} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+        </div>
+
         <div className="form-control w-full max-w-xs">
           <label className="label">
             <span className="label-text text-white">Budget:</span>
@@ -152,7 +159,6 @@ const MovieForm: React.FC = () => {
           <input type="number" name="budget" value={formData.budget} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
         </div>
 
-        {/* Repeat similar styling for other numerical inputs */}
         <div className="form-control w-full max-w-xs">
           <label className="label">
             <span className="label-text text-white">Runtime:</span>
@@ -164,145 +170,128 @@ const MovieForm: React.FC = () => {
           <label className="label">
             <span className="label-text text-white">Title Year:</span>
           </label>
-          <input type="number" name="titleYear" value={formData.titleYear} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+          <input type="number" name="title_year" value={formData.title_year} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
         </div>
 
         <div className="form-control w-full max-w-xs">
           <label className="label">
             <span className="label-text text-white">Release Week:</span>
           </label>
-          <input type="number" name="releaseWeek" value={formData.releaseWeek} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+          <input type="number" name="release_week" value={formData.release_week} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
         </div>
 
-        {/* Cast Size */}
         <div className="form-control w-full max-w-xs">
           <label className="label">
             <span className="label-text text-white">Cast Size:</span>
           </label>
-          <input type="number" name="castSize" value={formData.castSize} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+          <input type="number" name="cast_size" value={formData.cast_size} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
         </div>
 
-        {/* Crew Size */}
         <div className="form-control w-full max-w-xs">
           <label className="label">
             <span className="label-text text-white">Crew Size:</span>
           </label>
-          <input type="number" name="crewSize" value={formData.crewSize} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+          <input type="number" name="crew_size" value={formData.crew_size} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
         </div>
 
-        {/* Number of Production Companies */}
         <div className="form-control w-full max-w-xs">
           <label className="label">
             <span className="label-text text-white">Number of Production Companies:</span>
           </label>
-          <input type="number" name="numberProductionCompanies" value={formData.numberProductionCompanies} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+          <input type="number" name="number_production_companies" value={formData.number_production_companies} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
         </div>
 
-        {/* Director Count */}
         <div className="form-control w-full max-w-xs">
           <label className="label">
             <span className="label-text text-white">Director Count:</span>
           </label>
-          <input type="number" name="directorCount" value={formData.directorCount} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+          <input type="number" name="director_count" value={formData.director_count} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
         </div>
 
-        {/* Writer Count */}
         <div className="form-control w-full max-w-xs">
           <label className="label">
             <span className="label-text text-white">Writer Count:</span>
           </label>
-          <input type="number" name="writerCount" value={formData.writerCount} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+          <input type="number" name="writer_count" value={formData.writer_count} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
         </div>
 
-        {/* Editor Count */}
         <div className="form-control w-full max-w-xs">
           <label className="label">
             <span className="label-text text-white">Editor Count:</span>
           </label>
-          <input type="number" name="editorCount" value={formData.editorCount} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+          <input type="number" name="editor_count" value={formData.editor_count} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
         </div>
 
-        {/* Sound Department Size */}
         <div className="form-control w-full max-w-xs">
           <label className="label">
             <span className="label-text text-white">Sound Department Size:</span>
           </label>
-          <input type="number" name="soundDepartmentSize" value={formData.soundDepartmentSize} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+          <input type="number" name="sound_department_size" value={formData.sound_department_size} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
         </div>
 
-        {/* Costume Department Size */}
         <div className="form-control w-full max-w-xs">
           <label className="label">
             <span className="label-text text-white">Costume Department Size:</span>
           </label>
-          <input type="number" name="costumeDepartmentSize" value={formData.costumeDepartmentSize} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+          <input type="number" name="costume_department_size" value={formData.costume_department_size} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
         </div>
 
-        {/* Editing Department Size */}
         <div className="form-control w-full max-w-xs">
           <label className="label">
             <span className="label-text text-white">Editing Department Size:</span>
           </label>
-          <input type="number" name="editingDepartmentSize" value={formData.editingDepartmentSize} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+          <input type="number" name="editing_department_size" value={formData.editing_department_size} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
         </div>
 
-        {/* Production Department Size */}
         <div className="form-control w-full max-w-xs">
           <label className="label">
             <span className="label-text text-white">Production Department Size:</span>
           </label>
-          <input type="number" name="productionDepartmentSize" value={formData.productionDepartmentSize} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+          <input type="number" name="production_department_size" value={formData.production_department_size} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
         </div>
 
-        {/* Art Department Size */}
         <div className="form-control w-full max-w-xs">
           <label className="label">
             <span className="label-text text-white">Art Department Size:</span>
           </label>
-          <input type="number" name="artDepartmentSize" value={formData.artDepartmentSize} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+          <input type="number" name="art_department_size" value={formData.art_department_size} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
         </div>
 
-        {/* Camera Department Size */}
         <div className="form-control w-full max-w-xs">
           <label className="label">
             <span className="label-text text-white">Camera Department Size:</span>
           </label>
-          <input type="number" name="cameraDepartmentSize" value={formData.cameraDepartmentSize} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+          <input type="number" name="camera_department_size" value={formData.camera_department_size} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
         </div>
 
-        {/* VX Department Size */}
         <div className="form-control w-full max-w-xs">
           <label className="label">
             <span className="label-text text-white">VX Department Size:</span>
           </label>
-          <input type="number" name="vxDepartmentSize" value={formData.vxDepartmentSize} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+          <input type="number" name="vx_department_size" value={formData.vx_department_size} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
         </div>
 
-        {/* Male Cast Count */}
         <div className="form-control w-full max-w-xs">
           <label className="label">
             <span className="label-text text-white">Male Cast Count:</span>
           </label>
-          <input type="number" name="maleCastCount" value={formData.maleCastCount} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+          <input type="number" name="male_cast_count" value={formData.male_cast_count} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
         </div>
 
-        {/* Female Cast Count */}
         <div className="form-control w-full max-w-xs">
           <label className="label">
             <span className="label-text text-white">Female Cast Count:</span>
           </label>
-          <input type="number" name="femaleCastCount" value={formData.femaleCastCount} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+          <input type="number" name="female_cast_count" value={formData.female_cast_count} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
         </div>
 
-        {/* Unstated Gender Cast Count */}
         <div className="form-control w-full max-w-xs">
           <label className="label">
             <span className="label-text text-white">Unstated Gender Cast Count:</span>
           </label>
-          <input type="number" name="unstatedGenderCastCount" value={formData.unstatedGenderCastCount} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+          <input type="number" name="unstated_gender_cast_count" value={formData.unstated_gender_cast_count} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
         </div>
 
-        {/* Tagline */}
         <div className="form-control w-full max-w-xs">
           <label className="label">
             <span className="label-text text-white">Tagline:</span>
@@ -310,7 +299,6 @@ const MovieForm: React.FC = () => {
           <input type="text" name="tagline" value={formData.tagline} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
         </div>
 
-        {/* Overview */}
         <div className="form-control w-full max-w-xs">
           <label className="label">
             <span className="label-text text-white">Overview:</span>
@@ -318,38 +306,49 @@ const MovieForm: React.FC = () => {
           <input type="text" name="overview" value={formData.overview} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
         </div>
 
-
-        {/* Continue this pattern for each numerical input */}
-        {/* Styling for Director Name select */}
         <div className="form-control w-full max-w-xs">
           <label className="label">
             <span className="label-text text-white">Director Name:</span>
           </label>
           <select
-            name="directorName"
-            value={formData.directorName}
+            name="director_name"
+            value={formData.director_name}
             onChange={handleInputChange}
             className="select select-bordered w-full max-w-xs"
           >
             <option disabled value="">Select a director</option>
-            {options.directorName?.map(name => <option key={name} value={name}>{name}</option>)}
+            {options.director_name?.map(name => <option key={name} value={name}>{name}</option>)}
           </select>
         </div>
 
-        {/* Styling for multiple select fields like Production Companies and Genres */}
+        <div className="form-control w-full max-w-xs">
+          <label className="label">
+            <span className="label-text text-white">Country:</span>
+          </label>
+          <select
+            name="country"
+            value={formData.country}
+            onChange={handleInputChange}
+            className="select select-bordered w-full max-w-xs"
+          >
+            <option disabled value="">Select a country</option>
+            {options.country?.map(country => <option key={country} value={country}>{country}</option>)}
+          </select>
+        </div>
+
         <div className="form-control w-full max-w-xs">
           <label className="label">
             <span className="label-text text-white">Production Companies:</span>
           </label>
           <select
             multiple
-            name="productionCompanies"
-            value={formData.productionCompanies}
+            name="production_companies"
+            value={formData.production_companies}
             onChange={handleInputChange}
             className="select select-bordered w-full max-w-xs"
             size={5}
           >
-            {options.productionCompanies?.map(company => <option key={company} value={company}>{company}</option>)}
+            {options.production_companies?.map(company => <option key={company} value={company}>{company}</option>)}
           </select>
         </div>
 
@@ -375,30 +374,16 @@ const MovieForm: React.FC = () => {
           </label>
           <select
             multiple
-            name="spokenLanguages"
-            value={formData.spokenLanguages}
+            name="spoken_languages"
+            value={formData.spoken_languages}
             onChange={handleInputChange}
             className="select select-bordered w-full max-w-xs"
             size={5}
           >
-            {options.spokenLanguages?.map(language => <option key={language} value={language}>{language}</option>)}
+            {options.spoken_languages?.map(language => <option key={language} value={language}>{language}</option>)}
           </select>
         </div>
 
-        <div className="form-control w-full max-w-xs">
-          <label className="label">
-            <span className="label-text text-white">Country:</span>
-          </label>
-          <select
-            name="country"
-            value={formData.country}
-            onChange={handleInputChange}
-            className="select select-bordered w-full max-w-xs"
-          >
-            <option disabled value="">Select a country</option>
-            {options.country?.map(country => <option key={country} value={country}>{country}</option>)}
-          </select>
-        </div>
       </div>
       <button type="submit" className="btn btn-primary mt-4">Submit</button>
     </form>
