@@ -1,5 +1,26 @@
 'use client';
 import React, { useState, ChangeEvent, useEffect, FormEvent } from 'react';
+import { Line } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 interface FormData {
   movie_name: string;
@@ -37,6 +58,17 @@ interface Options {
   [key: string]: string[];
 }
 
+const chartOptions = {
+  scales: {
+    x: {
+      type: 'category' as const, // Use 'category' for x-axis
+    },
+    y: {
+      type: 'linear' as const, // Explicitly mention 'linear' for y-axis
+    },
+  },
+};
+
 
 const MovieForm: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
@@ -71,6 +103,7 @@ const MovieForm: React.FC = () => {
   });
 
   const [predictedRevenue, setPredictedRevenue] = useState<Number | null>(null)
+  const [allPredictedRevenues, setAllPredictedRevenues] = useState<number[]>([]);
   const [options, setOptions] = useState<Options>({});
 
   useEffect(() => {
@@ -135,6 +168,7 @@ const MovieForm: React.FC = () => {
       const data = await response.json();
       console.log(data);
       setPredictedRevenue(data);
+      setAllPredictedRevenues(prev => [...prev, data]);
     } catch (error) {
       console.error('There was an error!', error);
     }
@@ -142,12 +176,12 @@ const MovieForm: React.FC = () => {
 
 
   return (
-    <div className="bg-black min-h-screen w-full flex flex-col items-center">
-      <header className="text-center py-4">
+    <div className="bg-black min-h-screen w-full flex flex-col items-center justify-between px-4 py-2">
+      <header className="text-center py-2">
         <h1 className="text-white text-3xl font-bold">Box Officer Prediction</h1>
       </header>
       <form onSubmit={handleSubmit} className="text-white flex-1">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
 
           <div className="form-control w-full max-w-xs">
             <label className="label">
@@ -395,7 +429,7 @@ const MovieForm: React.FC = () => {
       </form>
       {
         predictedRevenue !== null && (
-          <div className="flex justify-center items-center m-4">
+          <div className="flex justify-center items-center m-2">
             <div className="text-center">
               <span className="label-text text-white">Predicted Revenue:</span>
               <div className="text-lg font-bold text-green-400">
@@ -405,6 +439,21 @@ const MovieForm: React.FC = () => {
           </div>
         )
       }
+      <div style={{ width: '550px', maxHeight: '400px', margin: '4px', overflow: "hidden" }}>
+        <Line
+          data={{
+            labels: allPredictedRevenues.map((_, index) => `Prediction ${index + 1}`),
+            datasets: [{
+              label: 'Predicted Revenue',
+              data: allPredictedRevenues,
+              fill: false,
+              backgroundColor: 'rgb(75, 192, 192)',
+              borderColor: 'rgba(75, 192, 192, 0.2)',
+            }]
+          }}
+          options={chartOptions}
+        />
+      </div>
     </div >
 
   );
