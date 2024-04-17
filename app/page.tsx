@@ -1,113 +1,410 @@
-import Image from "next/image";
+'use client';
+import React, { useState, ChangeEvent, useEffect, FormEvent } from 'react';
 
-export default function Home() {
+interface FormData {
+  budget: number;
+  runtime: number;
+  directorName: string;
+  productionCompanies: string[];
+  genres: string[];
+  spokenLanguages: string[];
+  country: string;
+  titleYear: number;
+  releaseWeek: number;
+  castSize: number;
+  crewSize: number;
+  numberProductionCompanies: number;
+  directorCount: number;
+  writerCount: number;
+  editorCount: number;
+  soundDepartmentSize: number;
+  costumeDepartmentSize: number;
+  editingDepartmentSize: number;
+  productionDepartmentSize: number;
+  artDepartmentSize: number;
+  cameraDepartmentSize: number;
+  vxDepartmentSize: number;
+  maleCastCount: number;
+  femaleCastCount: number;
+  unstatedGenderCastCount: number;
+  tagline: string;
+  overview: string;
+  [key: string]: number | string | string[];
+}
+
+interface Options {
+  [key: string]: string[];
+}
+
+
+const MovieForm: React.FC = () => {
+  const [formData, setFormData] = useState<FormData>({
+    budget: 0,
+    runtime: 0,
+    directorName: '',
+    productionCompanies: [],
+    genres: [],
+    spokenLanguages: [],
+    country: '',
+    titleYear: 0,
+    releaseWeek: 0,
+    castSize: 0,
+    crewSize: 0,
+    numberProductionCompanies: 0,
+    directorCount: 0,
+    writerCount: 0,
+    editorCount: 0,
+    soundDepartmentSize: 0,
+    costumeDepartmentSize: 0,
+    editingDepartmentSize: 0,
+    productionDepartmentSize: 0,
+    artDepartmentSize: 0,
+    cameraDepartmentSize: 0,
+    vxDepartmentSize: 0,
+    maleCastCount: 0,
+    femaleCastCount: 0,
+    unstatedGenderCastCount: 0,
+    tagline: '',
+    overview: '',
+  });
+
+
+
+  const [options, setOptions] = useState<Options>({});
+
+  useEffect(() => {
+    fetch('/encoder_state.json')
+      .then(response => response.json()).then(data => setOptions(data));
+
+  }, []);
+
+  const handleInputChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
+    const target = event.target;
+    const name = target.name;
+
+    if (target instanceof HTMLSelectElement && target.multiple) {
+      const valueSet = new Set(formData[name] as string[]);
+
+      if (valueSet.has(target.value)) {
+        valueSet.delete(target.value);
+      } else {
+        valueSet.add(target.value);
+      }
+
+      setFormData(prev => ({
+        ...prev,
+        [name]: Array.from(valueSet)
+      }));
+    } else if (target.type === 'number') {
+      const valueAsNumber = parseFloat(target.value);
+      setFormData(prev => ({
+        ...prev,
+        [name]: valueAsNumber
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: target.value
+      }));
+    }
+  };
+
+
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault(); // Prevent the default form submission behavior
+
+    // Construct the headers and body of the request
+    const requestOptions = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData) // Convert the formData object to a JSON string
+    };
+
+    try {
+        // Send the request to the endpoint
+        const response = await fetch('https://box-officer-predict-wap47zlzwq-uk.a.run.app/predict', requestOptions);
+        
+        if (!response.ok) {
+            // If the response is not 2xx, throw an error
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json(); // Parse the JSON response
+        console.log(data); // Log the data received from the server
+    } catch (error) {
+        console.error('There was an error!', error);
+    }
+};
+
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div className="bg-black min-h-screen w-full flex flex-col">
+    <form onSubmit={handleSubmit} className="text-white flex-1">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {/* Styling for Budget input */}
+        <div className="form-control w-full max-w-xs">
+          <label className="label">
+            <span className="label-text text-white">Budget:</span>
+          </label>
+          <input type="number" name="budget" value={formData.budget} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+        </div>
+
+        {/* Repeat similar styling for other numerical inputs */}
+        <div className="form-control w-full max-w-xs">
+          <label className="label">
+            <span className="label-text text-white">Runtime:</span>
+          </label>
+          <input type="number" name="runtime" value={formData.runtime} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+        </div>
+
+        <div className="form-control w-full max-w-xs">
+          <label className="label">
+            <span className="label-text text-white">Title Year:</span>
+          </label>
+          <input type="number" name="titleYear" value={formData.titleYear} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+        </div>
+
+        <div className="form-control w-full max-w-xs">
+          <label className="label">
+            <span className="label-text text-white">Release Week:</span>
+          </label>
+          <input type="number" name="releaseWeek" value={formData.releaseWeek} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+        </div>
+
+        {/* Cast Size */}
+        <div className="form-control w-full max-w-xs">
+          <label className="label">
+            <span className="label-text text-white">Cast Size:</span>
+          </label>
+          <input type="number" name="castSize" value={formData.castSize} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+        </div>
+
+        {/* Crew Size */}
+        <div className="form-control w-full max-w-xs">
+          <label className="label">
+            <span className="label-text text-white">Crew Size:</span>
+          </label>
+          <input type="number" name="crewSize" value={formData.crewSize} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+        </div>
+
+        {/* Number of Production Companies */}
+        <div className="form-control w-full max-w-xs">
+          <label className="label">
+            <span className="label-text text-white">Number of Production Companies:</span>
+          </label>
+          <input type="number" name="numberProductionCompanies" value={formData.numberProductionCompanies} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+        </div>
+
+        {/* Director Count */}
+        <div className="form-control w-full max-w-xs">
+          <label className="label">
+            <span className="label-text text-white">Director Count:</span>
+          </label>
+          <input type="number" name="directorCount" value={formData.directorCount} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+        </div>
+
+        {/* Writer Count */}
+        <div className="form-control w-full max-w-xs">
+          <label className="label">
+            <span className="label-text text-white">Writer Count:</span>
+          </label>
+          <input type="number" name="writerCount" value={formData.writerCount} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+        </div>
+
+        {/* Editor Count */}
+        <div className="form-control w-full max-w-xs">
+          <label className="label">
+            <span className="label-text text-white">Editor Count:</span>
+          </label>
+          <input type="number" name="editorCount" value={formData.editorCount} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+        </div>
+
+        {/* Sound Department Size */}
+        <div className="form-control w-full max-w-xs">
+          <label className="label">
+            <span className="label-text text-white">Sound Department Size:</span>
+          </label>
+          <input type="number" name="soundDepartmentSize" value={formData.soundDepartmentSize} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+        </div>
+
+        {/* Costume Department Size */}
+        <div className="form-control w-full max-w-xs">
+          <label className="label">
+            <span className="label-text text-white">Costume Department Size:</span>
+          </label>
+          <input type="number" name="costumeDepartmentSize" value={formData.costumeDepartmentSize} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+        </div>
+
+        {/* Editing Department Size */}
+        <div className="form-control w-full max-w-xs">
+          <label className="label">
+            <span className="label-text text-white">Editing Department Size:</span>
+          </label>
+          <input type="number" name="editingDepartmentSize" value={formData.editingDepartmentSize} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+        </div>
+
+        {/* Production Department Size */}
+        <div className="form-control w-full max-w-xs">
+          <label className="label">
+            <span className="label-text text-white">Production Department Size:</span>
+          </label>
+          <input type="number" name="productionDepartmentSize" value={formData.productionDepartmentSize} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+        </div>
+
+        {/* Art Department Size */}
+        <div className="form-control w-full max-w-xs">
+          <label className="label">
+            <span className="label-text text-white">Art Department Size:</span>
+          </label>
+          <input type="number" name="artDepartmentSize" value={formData.artDepartmentSize} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+        </div>
+
+        {/* Camera Department Size */}
+        <div className="form-control w-full max-w-xs">
+          <label className="label">
+            <span className="label-text text-white">Camera Department Size:</span>
+          </label>
+          <input type="number" name="cameraDepartmentSize" value={formData.cameraDepartmentSize} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+        </div>
+
+        {/* VX Department Size */}
+        <div className="form-control w-full max-w-xs">
+          <label className="label">
+            <span className="label-text text-white">VX Department Size:</span>
+          </label>
+          <input type="number" name="vxDepartmentSize" value={formData.vxDepartmentSize} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+        </div>
+
+        {/* Male Cast Count */}
+        <div className="form-control w-full max-w-xs">
+          <label className="label">
+            <span className="label-text text-white">Male Cast Count:</span>
+          </label>
+          <input type="number" name="maleCastCount" value={formData.maleCastCount} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+        </div>
+
+        {/* Female Cast Count */}
+        <div className="form-control w-full max-w-xs">
+          <label className="label">
+            <span className="label-text text-white">Female Cast Count:</span>
+          </label>
+          <input type="number" name="femaleCastCount" value={formData.femaleCastCount} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+        </div>
+
+        {/* Unstated Gender Cast Count */}
+        <div className="form-control w-full max-w-xs">
+          <label className="label">
+            <span className="label-text text-white">Unstated Gender Cast Count:</span>
+          </label>
+          <input type="number" name="unstatedGenderCastCount" value={formData.unstatedGenderCastCount} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+        </div>
+
+        {/* Tagline */}
+        <div className="form-control w-full max-w-xs">
+          <label className="label">
+            <span className="label-text text-white">Tagline:</span>
+          </label>
+          <input type="text" name="tagline" value={formData.tagline} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+        </div>
+
+        {/* Overview */}
+        <div className="form-control w-full max-w-xs">
+          <label className="label">
+            <span className="label-text text-white">Overview:</span>
+          </label>
+          <input type="text" name="overview" value={formData.overview} onChange={handleInputChange} className="input input-bordered w-full max-w-xs" />
+        </div>
+
+
+        {/* Continue this pattern for each numerical input */}
+        {/* Styling for Director Name select */}
+        <div className="form-control w-full max-w-xs">
+          <label className="label">
+            <span className="label-text text-white">Director Name:</span>
+          </label>
+          <select
+            name="directorName"
+            value={formData.directorName}
+            onChange={handleInputChange}
+            className="select select-bordered w-full max-w-xs"
           >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+            <option disabled value="">Select a director</option>
+            {options.directorName?.map(name => <option key={name} value={name}>{name}</option>)}
+          </select>
+        </div>
+
+        {/* Styling for multiple select fields like Production Companies and Genres */}
+        <div className="form-control w-full max-w-xs">
+          <label className="label">
+            <span className="label-text text-white">Production Companies:</span>
+          </label>
+          <select
+            multiple
+            name="productionCompanies"
+            value={formData.productionCompanies}
+            onChange={handleInputChange}
+            className="select select-bordered w-full max-w-xs"
+            size={5}
+          >
+            {options.productionCompanies?.map(company => <option key={company} value={company}>{company}</option>)}
+          </select>
+        </div>
+
+        <div className="form-control w-full max-w-xs">
+          <label className="label">
+            <span className="label-text text-white">Genres:</span>
+          </label>
+          <select
+            multiple
+            name="genres"
+            value={formData.genres}
+            onChange={handleInputChange}
+            className="select select-bordered w-full max-w-xs"
+            size={5}
+          >
+            {options.genres?.map(genre => <option key={genre} value={genre}>{genre}</option>)}
+          </select>
+        </div>
+
+        <div className="form-control w-full max-w-xs">
+          <label className="label">
+            <span className="label-text text-white">Spoken Languages:</span>
+          </label>
+          <select
+            multiple
+            name="spokenLanguages"
+            value={formData.spokenLanguages}
+            onChange={handleInputChange}
+            className="select select-bordered w-full max-w-xs"
+            size={5}
+          >
+            {options.spokenLanguages?.map(language => <option key={language} value={language}>{language}</option>)}
+          </select>
+        </div>
+
+        <div className="form-control w-full max-w-xs">
+          <label className="label">
+            <span className="label-text text-white">Country:</span>
+          </label>
+          <select
+            name="country"
+            value={formData.country}
+            onChange={handleInputChange}
+            className="select select-bordered w-full max-w-xs"
+          >
+            <option disabled value="">Select a country</option>
+            {options.country?.map(country => <option key={country} value={country}>{country}</option>)}
+          </select>
         </div>
       </div>
+      <button type="submit" className="btn btn-primary mt-4">Submit</button>
+    </form>
+    </div>
 
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
   );
-}
+};
+
+export default MovieForm;
