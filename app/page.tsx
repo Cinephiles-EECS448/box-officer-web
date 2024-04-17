@@ -142,7 +142,7 @@ const MovieForm: React.FC = () => {
 
 
   return (
-    <div className="bg-black min-h-screen w-full flex flex-col">
+    <div className="bg-black min-h-screen w-full flex flex-col items-center">
       <header className="text-center py-4">
         <h1 className="text-white text-3xl font-bold">Box Officer Prediction</h1>
       </header>
