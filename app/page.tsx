@@ -126,7 +126,7 @@ const MovieForm: React.FC = () => {
     };
 
     try {
-        const response = await fetch('http://127.0.0.1:8080/predict', requestOptions);
+        const response = await fetch('https://box-officer-predict-wap47zlzwq-uk.a.run.app/predict', requestOptions);
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
